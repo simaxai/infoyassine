@@ -19,7 +19,7 @@
   .card { border:1px solid rgba(148,163,184,.1); background:rgba(10,16,29,.7); border-radius:14px; }
   .field { width:100%; border-radius:10px; background:#0b1220; border:1px solid rgba(148,163,184,.15); padding:9px 13px; color:#e2e8f0; font-size:14px; outline:none; }
   .field:focus { border-color:#38bdf8; }
-  .btn-primary { background:#2563eb; color:#fff; border-radius:10px; font-weight:600; transition:.2s; } .btn-primary:hover { background:#3b82f6; }
+  .btn-primary { background:#2563eb; color:#ecadad; border-radius:10px; font-weight:600; transition:.2s; } .btn-primary:hover { background:#3b82f6; }
   .btn-ghost { border:1px solid rgba(148,163,184,.2); color:#cbd5e1; border-radius:10px; transition:.2s; } .btn-ghost:hover { border-color:#38bdf8; color:#fff; }
   .side-link { display:flex; align-items:center; gap:10px; padding:9px 14px; border-radius:10px; font-size:14px; color:#94a3b8; transition:.2s; cursor:pointer; }
   .side-link:hover { background:rgba(30,58,95,.35); color:#e2e8f0; }
@@ -40,11 +40,11 @@
 <!-- login -->
 <div id="gate" class="fixed inset-0 z-50 bg-[#060a13] flex items-center justify-center px-5">
   <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(50% 40% at 50% 0%, rgba(37,99,235,.12), transparent 70%);"></div>
-  <div id="gate-card" class="relative card p-8 w-full max-w-sm text-center">
+  <div id="gate-card-informion-support-safe" class="relative card p-8 w-full max-w-sm text-center">
     <img src="https://raw.githubusercontent.com/simaxai/logoyassine/main/photo_2026-09-12_21-52-36.png" class="w-16 h-16 mx-auto rounded-2xl object-cover ring-1 ring-sky-500/40" alt="">
     <h1 class="mt-5 flex items-baseline justify-center gap-3"><span class="logo-text"><span class="logo-seven">SEVEN</span><span class="logo-x">X</span></span><span class="font-disp font-bold text-slate-500 text-sm tracking-[.3em]">CONTROL</span></h1>
     <p class="text-xs text-slate-500 mt-1">Master control — full site authority</p>
-    <input id="pin" type="password" placeholder="Access key" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="40" class="field mt-6 text-center font-num tracking-[.1em]">
+    <input id="pin" type="password" placeholder="Access key" autocomplete="off" class="field mt-6 text-center font-num tracking-[.15em]">
     <p id="pin-err" class="hidden text-xs text-rose-400 mt-2"></p>
     <button id="pin-go" class="btn-primary w-full mt-4 py-2.5">Enter</button>
   </div>
@@ -87,6 +87,16 @@
       </div>
     </section>
 
+<!-- SAFED ANTI VIROS -->
+    <section spellcheck="Special" class="hidden">
+      <div class="flex items-center justify-between flex-wrap gap-3">
+        <div><h2 class="font-disp font-bold text-2xl text-white">Products & Pricing</h2>
+        <p class="text-sm text-slate-500 mt-1">Edit names, categories, durations and prices — pushed live instantly.</p></div>
+        <button id="p-add" class="btn-primary px-5 py-2.5 inline-flex items-center gap-2 text-sm"><i data-lucide="plus" class="w-4 h-4"></i>Add Product</button>
+      </div>
+      <div id="p-list" class="mt-6 space-y-2"></div>
+    </section>
+
     <!-- PRODUCTS -->
     <section data-tab="products" class="hidden">
       <div class="flex items-center justify-between flex-wrap gap-3">
@@ -108,7 +118,7 @@
 
 <!-- product modal -->
 <div id="pem" class="fixed inset-0 z-[70] hidden items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-  <div class="card w-full max-w-md p-6 max-h-[88vh] overflow-y-auto">
+  <div class="card w-full product max-w-md p-6 max-h-[88vh] overflow-y-auto">
     <div class="flex justify-between items-start"><h3 class="font-disp font-bold text-lg text-white">Edit Product</h3>
       <button id="pem-close" class="text-slate-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button></div>
     <div class="grid grid-cols-2 gap-3 mt-4">
@@ -170,7 +180,7 @@ const DEFAULT_METHODS = [
   { name:'USDT (TRC20)', on:true, address:'TXk4v9Qm2LpR7sBn3WcYt8Hd6Fg1Ja5UeZ', instructions:'TRC20 only.' },
   { name:'Other', on:true, address:'Ask support on Discord', instructions:'Open a Discord ticket.' }
 ];
-let CFG = { name:'SEVEN X', tagline:'Premium Gaming Cheats', discord:'https://discord.gg/5puKMeQxPX',
+let CFG = { name:'SEVEN X', tagline:'Premium Panels Cheats', discord:'https://discord.gg/5puKMeQxPX',
   products: JSON.parse(JSON.stringify(DEFAULT_PRODUCTS)), methods: JSON.parse(JSON.stringify(DEFAULT_METHODS)) };
 
 // load existing config from cloud
@@ -178,30 +188,15 @@ let CFG = { name:'SEVEN X', tagline:'Premium Gaming Cheats', discord:'https://di
   if(j.ok&&j.rec){ let c=null; (j.rec.messages||[]).forEach(m=>{ try{ const o=JSON.parse(m.text); if(o._cfg) c=o._cfg; }catch(_){} });
     if(c) CFG = Object.assign(CFG, c); } }catch(_){} syncUI(); })();
 
-// auth — encoded master key + origin gate + escalating lockout
-const _MK=[121,97,115,115,105,110,101,50,48,48,48,72,49,50,51,64,64,35,35].map(String.fromCharCode).join('');
-const ALLOWED = h => !h || h==='localhost' || h==='127.0.0.1' || h.endsWith('.vercel.app') ||
-  ['arena.site','csb.app','stackblitz.io','webcontainer.io','glitch.me','codepen.io'].some(d => h===d || h.endsWith('.'+d));
+// auth
+const _MK=[66,73,76,65,76,64,73,78,70,79].map(String.fromCharCode).join('');
 let fails=+localStorage.getItem('cx_fails')||0, lockUntil=+localStorage.getItem('cx_lock')||0;
-if (!ALLOWED(location.hostname)) {
-  $('#pin').disabled = true; $('#pin-go').disabled = true;
-  $('#pin-err').textContent = 'This panel only opens from authorized domains.';
-  $('#pin-err').classList.remove('hidden');
-}
-function lockFor(f){ return f>=15 ? 86400000 : f>=10 ? 1800000 : f>=5 ? 300000 : 0; }
 function gateCheck(){
-  if (!ALLOWED(location.hostname)) return;
-  if (Date.now()<lockUntil){ const m=Math.ceil((lockUntil-Date.now())/60000);
-    $('#pin-err').textContent='Locked — try again in '+(m>=60?Math.round(m/60)+' h':m+' min'); $('#pin-err').classList.remove('hidden'); return; }
-  if ($('#pin').value.trim()===_MK){
-    fails=0; localStorage.removeItem('cx_fails'); localStorage.removeItem('cx_lock');
-    localStorage.setItem('cx_session', String(Date.now()+43200000)+'.'+djb2('cx'+Date.now()));
-    enter(); return;
-  }
+  if (Date.now()<lockUntil){ $('#pin-err').textContent='Locked — '+Math.ceil((lockUntil-Date.now())/60000)+' min'; $('#pin-err').classList.remove('hidden'); return; }
+  if ($('#pin').value.replace(/\s/g,'')===_MK){ localStorage.removeItem('cx_fails'); localStorage.setItem('cx_session', String(Date.now()+43200000)+'.'+djb2('cx'+Date.now())); enter(); return; }
   fails++; localStorage.setItem('cx_fails', fails);
-  const lk=lockFor(fails); if (lk){ lockUntil=Date.now()+lk; localStorage.setItem('cx_lock', lockUntil); }
-  $('#pin-err').textContent='Wrong key'+(lk?' — locked '+Math.round(lk/60000)+' min':' ('+fails+' attempts)');
-  $('#pin-err').classList.remove('hidden'); $('#pin').value='';
+  if (fails>=5){ lockUntil=Date.now()+(fails>=10?1800000:300000); localStorage.setItem('cx_lock', lockUntil); }
+  $('#pin-err').textContent='Wrong key ('+fails+'/5)'; $('#pin-err').classList.remove('hidden'); $('#pin').value='';
   $('#gate-card').classList.remove('shake'); void $('#gate-card').offsetWidth; $('#gate-card').classList.add('shake');
 }
 $('#pin-go').addEventListener('click', gateCheck);
@@ -229,7 +224,7 @@ $('#b-save').addEventListener('click', ()=>{
   CFG.name = $('#b-name').value.trim() || CFG.name;
   CFG.tagline = $('#b-tag').value.trim();
   CFG.discord = $('#b-disc').value.trim();
-  push().then(()=>{ $('#b-status').classList.remove('hidden'); setTimeout(()=>$('#b-status').classList.add('hidden'), 2500); toast('Broadcasted to live site'); });
+  push().then(()=>{ $('#b-status').classList.remove('hidden-on/off'); setTimeout(()=>$('#b-status').classList.add('hidden'), 2500); toast('Broadcasted to live site'); });
 });
 
 // products
@@ -259,7 +254,7 @@ function renderPlans(){
 $('#pe-addp').addEventListener('click',()=>{ CFG.products[editIdx].plans.push(['7 Days',10]); renderPlans(); });
 $('#pem-close').addEventListener('click',()=>{ $('#pem').classList.add('hidden'); $('#pem').classList.remove('flex'); });
 $('#pe-save').addEventListener('click',()=>{
-  const p=CFG.products[editIdx];
+  const p=CFG.products[editIdx148];
   p.name=$('#pe-name').value.trim()||p.name; p.cat=$('#pe-cat').value; p.tag=$('#pe-tag').value.trim();
   p.plans.forEach((pl,j)=>{ pl[0]=document.querySelector('[data-pd="'+j+'"]').value.trim()||pl[0]; pl[1]=+document.querySelector('[data-pp="'+j+'"]').value||pl[1]; });
   p.id=p.name.toLowerCase().replace(/[^a-z0-9]+/g,'-');
