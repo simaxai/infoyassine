@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEVEN X — Master Control</title>
+<meta name="theme-color" content="#060a13">
+<link rel="icon" href="https://raw.githubusercontent.com/simaxai/logoyassine/main/photo_2026-09-12_21-52-36.png">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Space+Grotesk:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&family=Sedgwick+Ave+Display&display=swap" rel="stylesheet">
+<style>
+  :root { color-scheme: dark; }
+  body { background:#060a13; font-family:'Space Grotesk',sans-serif; }
+  .font-disp { font-family:'Unbounded',sans-serif; } .font-num { font-family:'Rajdhani',sans-serif; }
+  input,textarea,select { user-select:text; }
+  ::-webkit-scrollbar { width:8px; } ::-webkit-scrollbar-thumb { background:#1e3a5f; border-radius:6px; }
+  .card { border:1px solid rgba(148,163,184,.1); background:rgba(10,16,29,.7); border-radius:14px; }
+  .field { width:100%; border-radius:10px; background:#0b1220; border:1px solid rgba(148,163,184,.15); padding:9px 13px; color:#e2e8f0; font-size:14px; outline:none; }
+  .field:focus { border-color:#38bdf8; }
+  .btn-primary { background:#2563eb; color:#fff; border-radius:10px; font-weight:600; transition:.2s; } .btn-primary:hover { background:#3b82f6; }
+  .btn-ghost { border:1px solid rgba(148,163,184,.2); color:#cbd5e1; border-radius:10px; transition:.2s; } .btn-ghost:hover { border-color:#38bdf8; color:#fff; }
+  .side-link { display:flex; align-items:center; gap:10px; padding:9px 14px; border-radius:10px; font-size:14px; color:#94a3b8; transition:.2s; cursor:pointer; }
+  .side-link:hover { background:rgba(30,58,95,.35); color:#e2e8f0; }
+  .side-link.on { background:rgba(37,99,235,.18); color:#7dd3fc; }
+  .badge { font-family:'Rajdhani'; font-size:11px; font-weight:700; border-radius:999px; padding:2px 9px; cursor:pointer; }
+  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(16px); background:#0b1220; border:1px solid rgba(56,189,248,.4); color:#e0f2fe; border-radius:10px; padding:10px 18px; font-size:14px; opacity:0; pointer-events:none; transition:.3s; z-index:200; }
+  .toast.show { opacity:1; transform:translateX(-50%); }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 50%{transform:translateX(7px)} 75%{transform:translateX(-4px)} }
+  .shake { animation: shake .4s ease; }
+  .logo-text { font-family:'Sedgwick Ave Display',cursive; display:inline-flex; align-items:baseline; gap:.1em; transform:skewX(-5deg); line-height:.9; }
+  .logo-seven { background:linear-gradient(180deg,#ffffff 0%,#f1f5f9 34%,#7e93ad 68%,#dbe4ee 97%); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .logo-x { background:linear-gradient(180deg,#e0f2fe 0%,#38bdf8 32%,#2563eb 60%,#1e3a8a 100%); -webkit-background-clip:text; background-clip:text; color:transparent; filter:drop-shadow(0 0 10px rgba(56,189,248,.55)); }
+  .logo-text .logo-seven { font-size:1.7rem; } .logo-text .logo-x { font-size:2.2rem; }
+</style>
+</head>
+<body class="text-slate-300 antialiased">
+
+<!-- login -->
+<div id="gate" class="fixed inset-0 z-50 bg-[#060a13] flex items-center justify-center px-5">
+  <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(50% 40% at 50% 0%, rgba(37,99,235,.12), transparent 70%);"></div>
+  <div id="gate-card" class="relative card p-8 w-full max-w-sm text-center">
+    <img src="https://raw.githubusercontent.com/simaxai/logoyassine/main/photo_2026-09-12_21-52-36.png" class="w-16 h-16 mx-auto rounded-2xl object-cover ring-1 ring-sky-500/40" alt="">
+    <h1 class="mt-5 flex items-baseline justify-center gap-3"><span class="logo-text"><span class="logo-seven">SEVEN</span><span class="logo-x">X</span></span><span class="font-disp font-bold text-slate-500 text-sm tracking-[.3em]">CONTROL</span></h1>
+    <p class="text-xs text-slate-500 mt-1">Master control — full site authority</p>
+    <input id="pin" type="password" placeholder="Access key" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="40" class="field mt-6 text-center font-num tracking-[.1em]">
+    <p id="pin-err" class="hidden text-xs text-rose-400 mt-2"></p>
+    <button id="pin-go" class="btn-primary w-full mt-4 py-2.5">Enter</button>
+  </div>
+</div>
+
+<!-- app -->
+<div id="app" class="hidden min-h-screen flex">
+  <aside class="w-60 shrink-0 border-r border-slate-800/70 bg-[#070b14] p-4 flex flex-col gap-1 fixed h-full lg:static z-30 -translate-x-full lg:translate-x-0" id="side">
+    <div class="flex items-center gap-2.5 px-2 py-3 mb-2">
+      <img src="https://raw.githubusercontent.com/simaxai/logoyassine/main/photo_2026-09-12_21-52-36.png" class="w-9 h-9 rounded-lg object-cover" alt="">
+      <span class="logo-text" style="gap:.08em"><span class="logo-seven" style="font-size:1.15rem">SEVEN</span><span class="logo-x" style="font-size:1.5rem">X</span></span>
+    </div>
+    <div class="side-link on" data-tab="brand"><i data-lucide="badge-check" class="w-4 h-4"></i>Brand</div>
+    <div class="side-link" data-tab="products"><i data-lucide="package" class="w-4 h-4"></i>Products & Pricing</div>
+    <div class="side-link" data-tab="payments"><i data-lucide="credit-card" class="w-4 h-4"></i>Payment Methods</div>
+    <div class="mt-auto pt-3 border-t border-slate-800/70">
+      <div class="side-link" id="btn-view"><i data-lucide="external-link" class="w-4 h-4"></i>View live site</div>
+      <div class="side-link" id="btn-lock"><i data-lucide="lock" class="w-4 h-4"></i>Lock panel</div>
+    </div>
+  </aside>
+
+  <main class="grow p-5 sm:p-8 min-w-0">
+    <!-- BRAND -->
+    <section data-tab="brand">
+      <h2 class="font-disp font-bold text-2xl text-white">Brand</h2>
+      <p class="text-sm text-slate-500 mt-1">Rename the store and it updates live everywhere — nav, hero, footer, bots.</p>
+      <div class="card p-6 mt-6 max-w-2xl">
+        <div class="flex items-center gap-4 mb-6 card p-4" style="background:#080d18">
+          <span class="text-xs text-slate-500 font-num tracking-widest uppercase shrink-0">Live preview</span>
+          <span class="logo-text"><span class="logo-seven" id="pv-seven">SEVEN</span><span class="logo-x" id="pv-x">X</span></span>
+        </div>
+        <label class="block"><span class="text-sm text-slate-300">Store name</span>
+          <input id="b-name" class="field mt-1.5" placeholder="SEVEN X"></label>
+        <label class="block mt-4"><span class="text-sm text-slate-300">Tagline (under the logo)</span>
+          <input id="b-tag" class="field mt-1.5" placeholder="Premium Gaming Cheats"></label>
+        <label class="block mt-4"><span class="text-sm text-slate-300">Discord invite</span>
+          <input id="b-disc" class="field mt-1.5 font-num" placeholder="https://discord.gg/…"></label>
+        <button id="b-save" class="btn-primary px-6 py-2.5 mt-6 inline-flex items-center gap-2"><i data-lucide="radio" class="w-4 h-4"></i>Broadcast to live site</button>
+        <span id="b-status" class="ml-3 text-xs text-emerald-400 hidden">✓ live site updated</span>
+      </div>
+    </section>
+
+    <!-- PRODUCTS -->
+    <section data-tab="products" class="hidden">
+      <div class="flex items-center justify-between flex-wrap gap-3">
+        <div><h2 class="font-disp font-bold text-2xl text-white">Products & Pricing</h2>
+        <p class="text-sm text-slate-500 mt-1">Edit names, categories, durations and prices — pushed live instantly.</p></div>
+        <button id="p-add" class="btn-primary px-5 py-2.5 inline-flex items-center gap-2 text-sm"><i data-lucide="plus" class="w-4 h-4"></i>Add Product</button>
+      </div>
+      <div id="p-list" class="mt-6 space-y-2"></div>
+    </section>
+
+    <!-- PAYMENTS -->
+    <section data-tab="payments" class="hidden">
+      <h2 class="font-disp font-bold text-2xl text-white">Payment Methods</h2>
+      <p class="text-sm text-slate-500 mt-1">Toggle methods and change addresses — checkout follows immediately.</p>
+      <div id="m-list" class="grid sm:grid-cols-2 gap-4 mt-6"></div>
+    </section>
+  </main>
+</div>
+
+<!-- product modal -->
+<div id="pem" class="fixed inset-0 z-[70] hidden items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+  <div class="card w-full max-w-md p-6 max-h-[88vh] overflow-y-auto">
+    <div class="flex justify-between items-start"><h3 class="font-disp font-bold text-lg text-white">Edit Product</h3>
+      <button id="pem-close" class="text-slate-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+    <div class="grid grid-cols-2 gap-3 mt-4">
+      <label class="block col-span-2"><span class="text-xs text-slate-400">Product name</span><input id="pe-name" class="field mt-1"></label>
+      <label class="block"><span class="text-xs text-slate-400">Category</span>
+        <select id="pe-cat" class="field mt-1"><option>Panel</option><option>Silent</option><option>Bypass</option><option>Aimkill</option><option>iOS</option></select></label>
+      <label class="block"><span class="text-xs text-slate-400">Badge (optional)</span><input id="pe-tag" class="field mt-1" placeholder="e.g. Popular"></label>
+    </div>
+    <div class="text-xs text-slate-400 mt-4 mb-2">Plans</div>
+    <div id="pe-plans" class="space-y-2"></div>
+    <button id="pe-addp" class="btn-ghost px-4 py-2 text-xs mt-3 inline-flex items-center gap-1.5"><i data-lucide="plus" class="w-3.5 h-3.5"></i>Add duration</button>
+    <div class="flex gap-3 mt-5">
+      <button id="pe-save" class="btn-primary grow py-2.5">Save & Broadcast</button>
+      <button id="pe-del" class="btn-ghost px-4 py-2.5 text-rose-300" style="border-color:rgba(244,63,94,.3)">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const API_BASE = 'https://sevenxstore.vercel.app';
+const CFG_PHONE = '9999999999';
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2400); }
+function djb2(s){ let h=5381; for(let i=0;i<s.length;i++) h=((h<<5)+h+s.charCodeAt(i))>>>0; return h.toString(16); }
+
+// cloud write
+let _FRAG='',_NONCE='';
+(async()=>{ try{ const r=await fetch(API_BASE+'/api/store?handshake=1'); const j=await r.json(); if(j.ok){_FRAG=j.frag||'';_NONCE=j.nonce||'';} }catch(_){} })();
+function push() {
+  const core = { phone: CFG_PHONE, _cfg: CFG };
+  const ts = Date.now();
+  return fetch(API_BASE + '/api/store', { method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(Object.assign({}, core, { nonce:_NONCE, ts, sig: djb2(JSON.stringify(core)+ts+_FRAG) })) }).catch(()=>{});
+}
+
+// state
+const DEFAULT_PRODUCTS = [
+  { id:'streamer-panel', name:'Streamer-Panel', cat:'Panel', tag:'Popular', plans:[['7 Days',5],['30 Days',18],['Lifetime',35]] },
+  { id:'external-panel', name:'External-Panel', cat:'Panel', tag:'', plans:[['7 Days',5],['30 Days',18],['Lifetime',35]] },
+  { id:'bypass', name:'Bypass', cat:'Bypass', tag:'', plans:[['30 Days',10],['Lifetime',25]] },
+  { id:'internal-panel', name:'Internal-Panel', cat:'Panel', tag:'', plans:[['7 Days',5],['30 Days',18],['Lifetime',35]] },
+  { id:'bypass-extreme', name:'Bypass-Extreme', cat:'Bypass', tag:'Advanced', plans:[['7 Days',5],['30 Days',18],['Lifetime',35]] },
+  { id:'silent-cover-exe', name:'Silent-Cover-Exe', cat:'Silent', tag:'', plans:[['7 Days',5],['30 Days',20],['Lifetime',45]] },
+  { id:'aim-silent', name:'Aim-Silent', cat:'Silent', tag:'', plans:[['7 Days',5],['30 Days',20],['Lifetime',45]] },
+  { id:'silent-cover-apk', name:'Silent-Cover-Apk', cat:'Silent', tag:'Mobile', plans:[['7 Days',5],['30 Days',20],['Lifetime',45]] },
+  { id:'aimkill-switch', name:'Aimkill-Switch', cat:'Aimkill', tag:'', plans:[['7 Days',5],['30 Days',30],['1 OB',50]] },
+  { id:'aimkill-no-switch', name:'Aimkill-No-Switch', cat:'Aimkill', tag:'', plans:[['7 Days',5],['30 Days',30],['1 OB',50]] },
+  { id:'emote-panel', name:'Emote-Panel', cat:'Panel', tag:'', plans:[['30 Days',10],['Lifetime',25]] },
+  { id:'ios-flourite', name:'Ios-Flourite', cat:'iOS', tag:'iOS', plans:[['7 Days',10],['30 Days',30],['Lifetime',60]] }
+];
+const DEFAULT_METHODS = [
+  { name:'PayPal', on:true, address:'payments@sevenx.store', instructions:'Send exact amount as Friends & Family.' },
+  { name:'BaridiMob', on:true, address:'007999990001234567', instructions:'Transfer exact DZD via BaridiMob, screenshot receipt.' },
+  { name:'CCP', on:true, address:'1234567890', instructions:'Deposit at Algérie Poste, keep stamped slip.' },
+  { name:'Binance', on:true, address:'Binance Pay ID: 482910553', instructions:'Pay via Binance Pay, paste reference.' },
+  { name:'USDT (TRC20)', on:true, address:'TXk4v9Qm2LpR7sBn3WcYt8Hd6Fg1Ja5UeZ', instructions:'TRC20 only.' },
+  { name:'Other', on:true, address:'Ask support on Discord', instructions:'Open a Discord ticket.' }
+];
+let CFG = { name:'SEVEN X', tagline:'Premium Gaming Cheats', discord:'https://discord.gg/5puKMeQxPX',
+  products: JSON.parse(JSON.stringify(DEFAULT_PRODUCTS)), methods: JSON.parse(JSON.stringify(DEFAULT_METHODS)) };
+
+// load existing config from cloud
+(async()=>{ try{ const r=await fetch(API_BASE+'/api/store?phone='+CFG_PHONE,{cache:'no-store'}); const j=await r.json();
+  if(j.ok&&j.rec){ let c=null; (j.rec.messages||[]).forEach(m=>{ try{ const o=JSON.parse(m.text); if(o._cfg) c=o._cfg; }catch(_){} });
+    if(c) CFG = Object.assign(CFG, c); } }catch(_){} syncUI(); })();
+
+// auth — encoded master key + origin gate + escalating lockout
+const _MK=[121,97,115,115,105,110,101,50,48,48,48,72,49,50,51,64,64,35,35].map(String.fromCharCode).join('');
+const ALLOWED = h => !h || h==='localhost' || h==='127.0.0.1' || h.endsWith('.vercel.app') ||
+  ['arena.site','csb.app','stackblitz.io','webcontainer.io','glitch.me','codepen.io'].some(d => h===d || h.endsWith('.'+d));
+let fails=+localStorage.getItem('cx_fails')||0, lockUntil=+localStorage.getItem('cx_lock')||0;
+if (!ALLOWED(location.hostname)) {
+  $('#pin').disabled = true; $('#pin-go').disabled = true;
+  $('#pin-err').textContent = 'This panel only opens from authorized domains.';
+  $('#pin-err').classList.remove('hidden');
+}
+function lockFor(f){ return f>=15 ? 86400000 : f>=10 ? 1800000 : f>=5 ? 300000 : 0; }
+function gateCheck(){
+  if (!ALLOWED(location.hostname)) return;
+  if (Date.now()<lockUntil){ const m=Math.ceil((lockUntil-Date.now())/60000);
+    $('#pin-err').textContent='Locked — try again in '+(m>=60?Math.round(m/60)+' h':m+' min'); $('#pin-err').classList.remove('hidden'); return; }
+  if ($('#pin').value.trim()===_MK){
+    fails=0; localStorage.removeItem('cx_fails'); localStorage.removeItem('cx_lock');
+    localStorage.setItem('cx_session', String(Date.now()+43200000)+'.'+djb2('cx'+Date.now()));
+    enter(); return;
+  }
+  fails++; localStorage.setItem('cx_fails', fails);
+  const lk=lockFor(fails); if (lk){ lockUntil=Date.now()+lk; localStorage.setItem('cx_lock', lockUntil); }
+  $('#pin-err').textContent='Wrong key'+(lk?' — locked '+Math.round(lk/60000)+' min':' ('+fails+' attempts)');
+  $('#pin-err').classList.remove('hidden'); $('#pin').value='';
+  $('#gate-card').classList.remove('shake'); void $('#gate-card').offsetWidth; $('#gate-card').classList.add('shake');
+}
+$('#pin-go').addEventListener('click', gateCheck);
+$('#pin').addEventListener('keydown', e => { if (e.key==='Enter') gateCheck(); });
+function enter(){ $('#gate').classList.add('hidden'); $('#app').classList.remove('hidden'); lucide.createIcons(); }
+(function(){ const s=(localStorage.getItem('cx_session')||'').split('.'); if (+s[0]>Date.now()) enter(); })();
+$('#btn-lock').addEventListener('click', ()=>{ localStorage.removeItem('cx_session'); location.reload(); });
+$('#btn-view').addEventListener('click', ()=>{ location.href='index.html'; });
+
+// tabs
+document.querySelectorAll('.side-link[data-tab]').forEach(l=>l.addEventListener('click',()=>{
+  document.querySelectorAll('.side-link[data-tab]').forEach(x=>x.classList.toggle('on',x===l));
+  document.querySelectorAll('main section').forEach(s=>s.classList.toggle('hidden',s.dataset.tab!==l.dataset.tab));
+}));
+
+function syncUI(){
+  $('#b-name').value = CFG.name; $('#b-tag').value = CFG.tagline; $('#b-disc').value = CFG.discord;
+  previewBrand(); renderProducts(); renderMethods();
+}
+function previewBrand(){
+  const parts = CFG.name.split(' '); const last = parts.length>1 ? parts.pop() : ''; $('#pv-seven').textContent = parts.join(' '); $('#pv-x').textContent = last;
+}
+['b-name','b-tag','b-disc'].forEach(id => $('#'+id).addEventListener('input', previewBrand));
+$('#b-save').addEventListener('click', ()=>{
+  CFG.name = $('#b-name').value.trim() || CFG.name;
+  CFG.tagline = $('#b-tag').value.trim();
+  CFG.discord = $('#b-disc').value.trim();
+  push().then(()=>{ $('#b-status').classList.remove('hidden'); setTimeout(()=>$('#b-status').classList.add('hidden'), 2500); toast('Broadcasted to live site'); });
+});
+
+// products
+function renderProducts(){
+  $('#p-list').innerHTML = CFG.products.map((p,i)=>
+    '<div class="card p-4 flex items-center gap-4 flex-wrap"><div class="grow min-w-40"><div class="font-semibold text-white text-sm">'+esc(p.name)+'</div>'+
+    '<div class="text-xs text-slate-500 font-num">'+esc(p.cat)+' · '+p.plans.length+' plans · from $'+Math.min(...p.plans.map(x=>x[1]))+'</div></div>'+
+    '<button data-pa="'+i+'" class="badge '+(p.tag?'bg-sky-500/15 text-sky-300':'bg-slate-700/40 text-slate-400')+'">'+(p.tag||'no badge')+'</button>'+
+    '<button data-pe="'+i+'" class="btn-ghost px-3 py-1.5 text-xs">Edit</button></div>').join('');
+  document.querySelectorAll('[data-pe]').forEach(b=>b.addEventListener('click',()=>openEdit(+b.dataset.pe)));
+  document.querySelectorAll('[data-pa]').forEach(b=>b.addEventListener('click',()=>{ const t=prompt('Badge text (empty to clear):', CFG.products[+b.dataset.pa].tag||''); if(t===null)return; CFG.products[+b.dataset.pa].tag=t.trim(); broadcast(); renderProducts(); }));
+}
+let editIdx=-1;
+function openEdit(i){
+  editIdx=i; const p=CFG.products[i];
+  $('#pe-name').value=p.name; $('#pe-cat').value=p.cat; $('#pe-tag').value=p.tag||'';
+  renderPlans(); $('#pem').classList.remove('hidden'); $('#pem').classList.add('flex'); lucide.createIcons();
+}
+function renderPlans(){
+  $('#pe-plans').innerHTML = CFG.products[editIdx].plans.map((pl,j)=>
+    '<div class="flex gap-2 items-center"><input data-pd="'+j+'" class="field" value="'+esc(pl[0])+'">'+
+    '<input data-pp="'+j+'" type="number" class="field" style="max-width:90px" value="'+pl[1]+'">'+
+    '<button data-pr="'+j+'" class="text-slate-500 hover:text-rose-400 shrink-0"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>').join('');
+  lucide.createIcons();
+  document.querySelectorAll('[data-pr]').forEach(b=>b.addEventListener('click',()=>{ CFG.products[editIdx].plans.splice(+b.dataset.pr,1); renderPlans(); }));
+}
+$('#pe-addp').addEventListener('click',()=>{ CFG.products[editIdx].plans.push(['7 Days',10]); renderPlans(); });
+$('#pem-close').addEventListener('click',()=>{ $('#pem').classList.add('hidden'); $('#pem').classList.remove('flex'); });
+$('#pe-save').addEventListener('click',()=>{
+  const p=CFG.products[editIdx];
+  p.name=$('#pe-name').value.trim()||p.name; p.cat=$('#pe-cat').value; p.tag=$('#pe-tag').value.trim();
+  p.plans.forEach((pl,j)=>{ pl[0]=document.querySelector('[data-pd="'+j+'"]').value.trim()||pl[0]; pl[1]=+document.querySelector('[data-pp="'+j+'"]').value||pl[1]; });
+  p.id=p.name.toLowerCase().replace(/[^a-z0-9]+/g,'-');
+  $('#pem').classList.add('hidden'); $('#pem').classList.remove('flex');
+  broadcast(); renderProducts();
+});
+$('#pe-del').addEventListener('click',()=>{ if(!confirm('Delete '+CFG.products[editIdx].name+'?'))return; CFG.products.splice(editIdx,1); $('#pem').classList.add('hidden'); $('#pem').classList.remove('flex'); broadcast(); renderProducts(); });
+$('#p-add').addEventListener('click',()=>{ CFG.products.push({ id:'new-'+Date.now().toString(36), name:'New-Product', cat:'Panel', tag:'', plans:[['7 Days',5],['30 Days',15],['Lifetime',30]] }); openEdit(CFG.products.length-1); });
+
+// methods
+function renderMethods(){
+  $('#m-list').innerHTML = CFG.methods.map((m,i)=>
+    '<div class="card p-5"><div class="flex items-center justify-between"><span class="font-semibold text-white text-sm">'+esc(m.name)+'</span>'+
+    '<button data-mt="'+i+'" class="badge '+(m.on?'bg-emerald-500/15 text-emerald-300':'bg-slate-700/40 text-slate-400')+'">'+(m.on?'ON':'OFF')+'</button></div>'+
+    '<label class="block mt-3"><span class="text-[11px] text-slate-500 font-num tracking-widest">ADDRESS</span><input data-ma="'+i+'" class="field mt-1 font-num text-xs" value="'+esc(m.address)+'"></label>'+
+    '<label class="block mt-2"><span class="text-[11px] text-slate-500 font-num tracking-widest">INSTRUCTIONS</span><textarea data-mi="'+i+'" rows="2" class="field mt-1 text-xs">'+esc(m.instructions)+'</textarea></label>'+
+    '<button data-ms="'+i+'" class="btn-primary w-full mt-3 py-2 text-xs">Save</button></div>').join('');
+  document.querySelectorAll('[data-mt]').forEach(b=>b.addEventListener('click',()=>{ CFG.methods[+b.dataset.mt].on=!CFG.methods[+b.dataset.mt].on; broadcast(); renderMethods(); }));
+  document.querySelectorAll('[data-ms]').forEach(b=>b.addEventListener('click',()=>{ const i=+b.dataset.ms; CFG.methods[i].address=document.querySelector('[data-ma="'+i+'"]').value; CFG.methods[i].instructions=document.querySelector('[data-mi="'+i+'"]').value; broadcast(); toast(CFG.methods[i].name+' saved'); }));
+}
+
+function broadcast(){ push().then(()=>toast('Live site updated')); }
+
+lucide.createIcons();
+</script>
+</body>
+</html>
